@@ -84,7 +84,7 @@ Render is an outstanding cloud deployment platform for TSOS. Because TSOS is a c
 4. Connect your `mega-tsos` repository.
 5. Render will automatically parse [`render.yaml`](file:///d:/work/megatech/mega-tsos/render.yaml):
    - Service Type: `Static Site`
-   - Build Command: `npm install && npm run build`
+   - Build Command: `npm run build`
    - Publish Directory: `./dist`
    - Routing Rewrites: `/*` $\rightarrow$ `/index.html` (prevents 404s on table QR & POS URLs)
    - Environment Variables: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
@@ -97,7 +97,7 @@ If you prefer configuring it manually without Blueprints:
 3. Configure the build parameters:
    - **Name**: `tsos-cafe-pos`
    - **Branch**: `master` (or `main`)
-   - **Build Command**: `npm install && npm run build`
+   - **Build Command**: `npm run build`
    - **Publish Directory**: `dist`
 4. Add **Environment Variables**:
    - `VITE_SUPABASE_URL`: `https://vbufsuzzmehsidshopku.supabase.co`

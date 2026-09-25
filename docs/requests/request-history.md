@@ -156,6 +156,15 @@ This document maintains an exact, comprehensive chronological ledger of all user
 - **Core Directive**: Configure remote repository `https://github.com/OmKardile/tsos-alt.git`, set local author to `Omkar Kardile <omkardile84@gmail.com>`, ensure sequential commit history, and push.
 - **Resolution**: Configured local Git identity (`user.name "Omkar Kardile"`, `user.email "omkardile84@gmail.com"`). Re-authored all 5 commits to guarantee proper GitHub contribution credit. Approved GitHub authentication token via Windows Credential Manager. Successfully pushed both `master` and `main` branches to `https://github.com/OmKardile/tsos-alt.git`.
 
+---
+
+## Request 18: Render Build ERESOLVE Fix & Build Command Optimization
+
+- **Timestamp**: 2026-09-25T15:45:00Z
+- **Core Directive**: Fix Render deployment build failure (`npm error code ERESOLVE: Conflicting peer dependency: esbuild@0.28.2`).
+- **Resolution**: Identified peer dependency mismatch between `devDependencies.esbuild@^0.25.0` and `vite@8.3.1` (which requires `^0.27.0 || ^0.28.0`). Removed conflicting `esbuild` from `package.json`, generated `.npmrc` with `legacy-peer-deps=true` for CI/CD resilience, and optimized `render.yaml` buildCommand from `npm install && npm run build` to `npm run build`. Verified clean `npm install` and local production build (`npm run build` in 668ms). Pushed fixes to GitHub `master` and `main`.
+
+
 
 
 
