@@ -1,0 +1,153 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --tsos-bg: #FFF9F2;
+    --tsos-surface: #FFFFFF;
+    --tsos-surface-secondary: #F5F0EB;
+    --tsos-divider: #E9E0D6;
+    --tsos-action: #F97316;
+    --tsos-action-hover: #EA580C;
+    --tsos-action-soft: #FFF1E6;
+    --tsos-completed: #17803D;
+    --tsos-completed-soft: #E8F5EC;
+    --tsos-attention: #B45309;
+    --tsos-attention-soft: #FFF4E5;
+    --tsos-destructive: #B42318;
+    --tsos-destructive-soft: #FEF2F2;
+    --tsos-info: #2563EB;
+    --tsos-info-soft: #EFF6FF;
+    --tsos-accent: #7C3AED;
+    --tsos-accent-soft: #F5F3FF;
+    --tsos-text-primary: #1C1917;
+    --tsos-text-secondary: #57534E;
+    --tsos-text-muted: #A8A29E;
+  }
+
+  body {
+    background-color: var(--tsos-bg);
+    color: var(--tsos-text-primary);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  }
+}
+
+/* ==========================================================================
+   OBSIDIAN MODE (Global System Ultra-Dark Theme)
+   ========================================================================== */
+[data-theme="obsidian"],
+.obsidian {
+  --tsos-bg: #0C0A09;
+  --tsos-surface: #18181B;
+  --tsos-surface-secondary: #27272A;
+  --tsos-divider: #27272A;
+  --tsos-action: #F97316;
+  --tsos-action-hover: #EA580C;
+  --tsos-action-soft: rgba(249, 115, 22, 0.15);
+  --tsos-completed: #16A34A;
+  --tsos-completed-soft: rgba(22, 163, 74, 0.15);
+  --tsos-attention: #F59E0B;
+  --tsos-attention-soft: rgba(245, 158, 11, 0.15);
+  --tsos-destructive: #EF4444;
+  --tsos-destructive-soft: rgba(239, 68, 68, 0.15);
+  --tsos-text-primary: #FAFAFA;
+  --tsos-text-secondary: #D4D4D8;
+  --tsos-text-muted: #A1A1AA;
+  color-scheme: dark;
+}
+
+[data-theme="obsidian"] body {
+  background-color: #0C0A09 !important;
+  color: #FAFAFA !important;
+}
+
+/* Background surfaces */
+[data-theme="obsidian"] .bg-\[\#FFF9F2\],
+[data-theme="obsidian"] .bg-white {
+  background-color: #18181B !important;
+}
+
+[data-theme="obsidian"] .bg-\[\#FFF1E6\],
+[data-theme="obsidian"] .bg-\[\#F5F0EB\],
+[data-theme="obsidian"] .bg-\[\#FFF9F2\]\/50 {
+  background-color: #27272A !important;
+}
+
+/* Text colors */
+[data-theme="obsidian"] .text-\[\#1C1917\] {
+  color: #FAFAFA !important;
+}
+
+[data-theme="obsidian"] .text-\[\#57534E\],
+[data-theme="obsidian"] .text-\[\#78716C\] {
+  color: #D4D4D8 !important;
+}
+
+[data-theme="obsidian"] .text-\[\#A8A29E\],
+[data-theme="obsidian"] .text-\[\#D6D3D1\] {
+  color: #A1A1AA !important;
+}
+
+/* Borders and dividers */
+[data-theme="obsidian"] .border-\[\#E9E0D6\],
+[data-theme="obsidian"] .border-\[\#F5E6D8\],
+[data-theme="obsidian"] .border-\[\#D5C9BD\] {
+  border-color: #27272A !important;
+}
+
+/* Interactive elements & hover */
+[data-theme="obsidian"] .hover\:bg-\[\#F5F0EB\]:hover,
+[data-theme="obsidian"] .hover\:bg-\[\#FFF1E6\]:hover,
+[data-theme="obsidian"] .hover\:bg-\[\#FFF9F2\]:hover,
+[data-theme="obsidian"] .hover\:bg-white\/60:hover {
+  background-color: #27272A !important;
+}
+
+/* Header & Navigation Bar in Obsidian */
+[data-theme="obsidian"] header,
+[data-theme="obsidian"] nav {
+  background-color: #121214 !important;
+  border-color: #27272A !important;
+}
+
+/* Inputs & selects */
+[data-theme="obsidian"] input:not([type="checkbox"]):not([type="radio"]),
+[data-theme="obsidian"] select,
+[data-theme="obsidian"] textarea {
+  background-color: #27272A !important;
+  border-color: #3F3F46 !important;
+  color: #FAFAFA !important;
+}
+
+/* Card drawers & modals */
+[data-theme="obsidian"] .shadow-2xl,
+[data-theme="obsidian"] .shadow-xl {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85) !important;
+}
+
+/* Custom Scrollbar for clean POS & KDS viewing */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #E9E0D6;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #D5C9BD;
+}
+
+[data-theme="obsidian"] ::-webkit-scrollbar-thumb {
+  background: #3F3F46;
+}
+[data-theme="obsidian"] ::-webkit-scrollbar-thumb:hover {
+  background: #52525B;
+}

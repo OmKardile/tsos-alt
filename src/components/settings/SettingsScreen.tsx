@@ -1,0 +1,823 @@
+import React, { useState } from 'react';
+import { useTsosStore } from '../../lib/store';
+import { SEED_PROFILES } from '../../data/seedData';
+import { PrinterConfig, PaperWidth } from '../../types';
+import {
+  Sliders,
+  Store,
+  CreditCard,
+  Zap,
+  Users,
+  Database,
+  RotateCcw,
+  Check,
+  ShieldCheck,
+  Building,
+  Printer,
+  Wifi,
+  Bluetooth,
+  Usb,
+  DollarSign,
+  Scissors,
+  Sparkles,
+  HelpCircle,
+  FileCheck2,
+  Monitor,
+  Download,
+  Smartphone,
+} from 'lucide-react';
+import {
+  generateTestReceiptEscPos,
+  triggerCashDrawerKick,
+  printViaBluetooth,
+} from '../../lib/printerService';
+import { GuidanceTooltip } from '../common/GuidanceTooltip';
+import { HardwareDownloadsModal } from '../common/HardwareDownloadsModal';
+
+export const SettingsScreen: React.FC = () => {
+  const {
+    location,
+    feeConfig,
+    updateFeeConfig,
+    currentProfile,
+    setCurrentProfile,
+    resetToSeed,
+    printerConfig,
+    updatePrinterConfig,
+    startTour,
+    guidanceMode,
+    toggleGuidanceMode,
+  } = useTsosStore();
+
+  const [savedSuccess, setSavedSuccess] = useState(false);
+  const [printerSavedSuccess, setPrinterSavedSuccess] = useState(false);
+  const [testPrintFeedback, setTestPrintFeedback] = useState<string | null>(null);
+  const [isHardwareDownloadsOpen, setIsHardwareDownloadsOpen] = useState(false);
+
+  // Fee engine form state
+  const [feePayer, setFeePayer] = useState(feeConfig.default_fee_payer);
+  const [perOrderFee, setPerOrderFee] = useState(feeConfig.per_order_fee);
+  const [autoFlipEnabled, setAutoFlipEnabled] = useState(feeConfig.auto_flip_enabled);
+  const [autoFlipThreshold, setAutoFlipThreshold] = useState(feeConfig.customer_paid_order_limit);
+
+  // Thermal printer form state
+  const [printerForm, setPrinterForm] = useState<PrinterConfig>({ ...printerConfig });
+
+  const handleSaveFeeConfig = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateFeeConfig({
+      default_fee_payer: feePayer,
+      per_order_fee: perOrderFee,
+      auto_flip_enabled: autoFlipEnabled,
+      customer_paid_order_limit: autoFlipThreshold,
+    });
+    setSavedSuccess(true);
+    setTimeout(() => setSavedSuccess(false), 2500);
+  };
+
+  const handleSavePrinterConfig = (e: React.FormEvent) => {
+    e.preventDefault();
+    updatePrinterConfig(printerForm);
+    setPrinterSavedSuccess(true);
+    setTimeout(() => setPrinterSavedSuccess(false), 2500);
+  };
+
+  const handleTestPrint = async () => {
+    const testBytes = generateTestReceiptEscPos(location, printerForm);
+
+    if (printerForm.connection_type === 'bluetooth') {
+      const res = await printViaBluetooth(testBytes);
+      setTestPrintFeedback(res.message);
+      setTimeout(() => setTestPrintFeedback(null), 4000);
+      return;
+    }
+
+    if (printerForm.open_cash_drawer) {
+      triggerCashDrawerKick();
+    }
+
+    setTestPrintFeedback(
+      `Test pattern (${printerForm.paper_width}, ${printerForm.connection_type.toUpperCase()}) dispatched. Triggering print dialog.`
+    );
+    window.print();
+    setTimeout(() => setTestPrintFeedback(null), 4000);
+  };
+
+  const handleTestDrawerKick = () => {
+    const res = triggerCashDrawerKick();
+    setTestPrintFeedback(res.message);
+    setTimeout(() => setTestPrintFeedback(null), 3000);
+  };
+
+  return (
+    <div className="flex-1 overflow-y-auto bg-[#F5F0EB] p-4 lg:p-8">
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Header & Quick Tour Trigger */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-xl font-black text-[#1C1917] tracking-tight flex items-center gap-2">
+              <span>Cafe & Hardware Settings</span>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-[#E9E0D6] text-[#57534E] font-normal">
+                Station #{location.id}
+              </span>
+            </h1>
+            <p className="text-xs text-[#57534E] mt-0.5">
+              Configure thermal bill printing, cash drawer kick, zero-subscription fee engine, and guidance mode.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setIsHardwareDownloadsOpen(true)}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#1C1917] hover:bg-black text-white text-xs font-bold shadow-2xs transition-colors cursor-pointer"
+            >
+              <Download className="w-4 h-4 text-[#F97316]" />
+              <span>Hardware & Downloads</span>
+            </button>
+            <button
+              type="button"
+              onClick={startTour}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-[#E9E0D6] text-xs font-bold text-[#1C1917] hover:bg-[#FFF9F2] shadow-2xs transition-colors"
+            >
+              <Sparkles className="w-4 h-4 text-[#F97316]" />
+              <span>Launch Guided Tour</span>
+            </button>
+            <button
+              type="button"
+              onClick={toggleGuidanceMode}
+              className={`px-3 py-2 rounded-xl text-xs font-bold transition-colors ${
+                guidanceMode
+                  ? 'bg-[#7C3AED] text-white shadow-2xs'
+                  : 'bg-white text-[#57534E] border border-[#E9E0D6]'
+              }`}
+            >
+              {guidanceMode ? 'Guidance ON' : 'Guidance OFF'}
+            </button>
+          </div>
+        </div>
+
+        {/* 1. THERMAL BILL & KOT PRINTER INTEGRATION */}
+        <div className="bg-white rounded-3xl border border-[#E9E0D6] p-6 shadow-xs space-y-6">
+          <div className="flex items-center justify-between border-b border-[#F5F0EB] pb-4">
+            <div className="flex items-center gap-2.5">
+              <div className="w-10 h-10 rounded-2xl bg-[#FFF1E6] text-[#F97316] flex items-center justify-center">
+                <Printer className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-bold text-base text-[#1C1917] flex items-center gap-2">
+                  <span>Thermal Receipt & KOT Printer Integration</span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">
+                    ESC/POS
+                  </span>
+                </h3>
+                <p className="text-xs text-[#57534E]">
+                  Connect 58mm or 80mm thermal receipt printers via Web Print, Network/LAN, Bluetooth, or USB.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleTestDrawerKick}
+                className="px-3 py-1.5 rounded-xl border border-[#E9E0D6] bg-white text-xs font-semibold text-[#57534E] hover:bg-[#F5F0EB] flex items-center gap-1.5 shadow-2xs"
+                title="Send test RJ11/RJ12 drawer kick pulse"
+              >
+                <DollarSign className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Test Drawer</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleTestPrint}
+                className="px-3.5 py-1.5 rounded-xl bg-[#1C1917] hover:bg-black text-white text-xs font-bold flex items-center gap-1.5 shadow-2xs"
+              >
+                <Printer className="w-3.5 h-3.5 text-[#F97316]" />
+                <span>Diagnostic Test Print</span>
+              </button>
+            </div>
+          </div>
+
+          {testPrintFeedback && (
+            <div className="p-3 bg-amber-50 text-amber-900 border border-amber-200 rounded-xl text-xs flex items-center gap-2 animate-in fade-in">
+              <FileCheck2 className="w-4 h-4 text-amber-600 shrink-0" />
+              <span>{testPrintFeedback}</span>
+            </div>
+          )}
+
+          {printerSavedSuccess && (
+            <div className="p-3 bg-emerald-50 text-emerald-900 border border-emerald-200 rounded-xl text-xs flex items-center gap-2 animate-in fade-in">
+              <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>Printer settings saved successfully! Thermal bills will format according to your choices.</span>
+            </div>
+          )}
+
+          <form onSubmit={handleSavePrinterConfig} className="space-y-5">
+            {/* Connection Type */}
+            <div>
+              <label className="block text-xs font-bold text-[#1C1917] mb-2">
+                Printer Connection Interface
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                {[
+                  {
+                    id: 'browser',
+                    name: 'Browser / System Dialog',
+                    icon: Printer,
+                    desc: 'Zero drivers needed. Works across Chrome, Edge, and Windows print spools.',
+                  },
+                  {
+                    id: 'network',
+                    name: 'Network / LAN (TCP:9100)',
+                    icon: Wifi,
+                    desc: 'Direct socket to Ethernet or Wi-Fi thermal printer IP address.',
+                  },
+                  {
+                    id: 'bluetooth',
+                    name: 'Web Bluetooth (SPP)',
+                    icon: Bluetooth,
+                    desc: 'Direct wireless pairing with handheld mobile thermal printers.',
+                  },
+                  {
+                    id: 'usb',
+                    name: 'Web USB Direct',
+                    icon: Usb,
+                    desc: 'Direct raw ESC/POS byte streaming to desktop USB receipt printer.',
+                  },
+                ].map((conn) => {
+                  const Icon = conn.icon;
+                  const isSelected = printerForm.connection_type === conn.id;
+                  return (
+                    <button
+                      key={conn.id}
+                      type="button"
+                      onClick={() =>
+                        setPrinterForm((prev) => ({
+                          ...prev,
+                          connection_type: conn.id as any,
+                        }))
+                      }
+                      className={`p-3.5 rounded-2xl border text-left transition-all ${
+                        isSelected
+                          ? 'border-[#F97316] bg-[#FFF9F2] ring-1 ring-[#F97316]'
+                          : 'border-[#E9E0D6] bg-white hover:bg-[#FAFAFA]'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1.5">
+                        <Icon className={`w-4 h-4 ${isSelected ? 'text-[#F97316]' : 'text-[#57534E]'}`} />
+                        {isSelected && <span className="w-2 h-2 rounded-full bg-[#F97316]" />}
+                      </div>
+                      <div className="font-bold text-xs text-[#1C1917]">{conn.name}</div>
+                      <div className="text-[11px] text-[#57534E] mt-1 leading-snug">{conn.desc}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Paper Width & IP Details */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-[#57534E] mb-1">
+                  Thermal Paper Roll Width
+                </label>
+                <div className="flex rounded-xl border border-[#E9E0D6] overflow-hidden bg-white p-1">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setPrinterForm((prev) => ({ ...prev, paper_width: '80mm' }))
+                    }
+                    className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors ${
+                      printerForm.paper_width === '80mm'
+                        ? 'bg-[#1C1917] text-white'
+                        : 'text-[#57534E] hover:bg-[#F5F0EB]'
+                    }`}
+                  >
+                    80mm (Standard Desktop)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setPrinterForm((prev) => ({ ...prev, paper_width: '58mm' }))
+                    }
+                    className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors ${
+                      printerForm.paper_width === '58mm'
+                        ? 'bg-[#1C1917] text-white'
+                        : 'text-[#57534E] hover:bg-[#F5F0EB]'
+                    }`}
+                  >
+                    58mm (Compact Mobile)
+                  </button>
+                </div>
+                <span className="text-[10px] text-[#A8A29E] mt-1 block">
+                  {printerForm.paper_width === '80mm'
+                    ? '48 characters per line'
+                    : '32 characters per line'}
+                </span>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#57534E] mb-1">
+                  Printer IP / Host Address (Port 9100)
+                </label>
+                <input
+                  type="text"
+                  value={printerForm.ip_address || ''}
+                  onChange={(e) =>
+                    setPrinterForm((prev) => ({ ...prev, ip_address: e.target.value }))
+                  }
+                  placeholder="192.168.1.200"
+                  className="w-full px-3 py-2 text-xs font-mono font-bold rounded-xl border border-[#E9E0D6] bg-white focus:border-[#F97316] focus:outline-hidden"
+                />
+                <span className="text-[10px] text-[#A8A29E] mt-1 block">
+                  Used for Network thermal printers over Wi-Fi/LAN
+                </span>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#57534E] mb-1">
+                  Kitchen KOT Printer IP
+                </label>
+                <input
+                  type="text"
+                  value={printerForm.kot_printer_ip || ''}
+                  onChange={(e) =>
+                    setPrinterForm((prev) => ({ ...prev, kot_printer_ip: e.target.value }))
+                  }
+                  placeholder="192.168.1.201:9100"
+                  className="w-full px-3 py-2 text-xs font-mono font-bold rounded-xl border border-[#E9E0D6] bg-white focus:border-[#F97316] focus:outline-hidden"
+                />
+                <span className="text-[10px] text-[#A8A29E] mt-1 block">
+                  Dedicated ticket printer stationed in barista/kitchen
+                </span>
+              </div>
+            </div>
+
+            {/* Automation Toggles */}
+            <div className="p-4 rounded-2xl bg-[#FFF9F2] border border-[#E9E0D6] grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={printerForm.auto_print_receipt}
+                  onChange={(e) =>
+                    setPrinterForm((prev) => ({
+                      ...prev,
+                      auto_print_receipt: e.target.checked,
+                    }))
+                  }
+                  className="mt-0.5 rounded-sm text-[#F97316] focus:ring-0"
+                />
+                <div>
+                  <span className="text-xs font-bold text-[#1C1917]">
+                    Auto-Print Customer Bill on Payment
+                  </span>
+                  <p className="text-[11px] text-[#57534E]">
+                    Instantly triggers receipt printer when bill is settled via UPI, Cash, or Card.
+                  </p>
+                </div>
+              </label>
+
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={printerForm.auto_print_kot}
+                  onChange={(e) =>
+                    setPrinterForm((prev) => ({
+                      ...prev,
+                      auto_print_kot: e.target.checked,
+                    }))
+                  }
+                  className="mt-0.5 rounded-sm text-[#F97316] focus:ring-0"
+                />
+                <div>
+                  <span className="text-xs font-bold text-[#1C1917]">
+                    Auto-Print Kitchen Order Ticket (KOT)
+                  </span>
+                  <p className="text-[11px] text-[#57534E]">
+                    Sends ticket to kitchen printer immediately upon cart confirmation.
+                  </p>
+                </div>
+              </label>
+
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={printerForm.open_cash_drawer}
+                  onChange={(e) =>
+                    setPrinterForm((prev) => ({
+                      ...prev,
+                      open_cash_drawer: e.target.checked,
+                    }))
+                  }
+                  className="mt-0.5 rounded-sm text-[#F97316] focus:ring-0"
+                />
+                <div>
+                  <span className="text-xs font-bold text-[#1C1917]">
+                    Auto-Kick Cash Drawer on Cash Sale
+                  </span>
+                  <p className="text-[11px] text-[#57534E]">
+                    Sends ESC/POS pulse (ESC p 0 25 250) to RJ11/RJ12 drawer port.
+                  </p>
+                </div>
+              </label>
+
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={printerForm.cut_paper}
+                  onChange={(e) =>
+                    setPrinterForm((prev) => ({
+                      ...prev,
+                      cut_paper: e.target.checked,
+                    }))
+                  }
+                  className="mt-0.5 rounded-sm text-[#F97316] focus:ring-0"
+                />
+                <div>
+                  <span className="text-xs font-bold text-[#1C1917]">
+                    Automatic Paper Guillotine Cut
+                  </span>
+                  <p className="text-[11px] text-[#57534E]">
+                    Feeds 3 blank lines and triggers hardware cutter command (GS V 66 0).
+                  </p>
+                </div>
+              </label>
+            </div>
+
+            {/* Bill Header, Footer & GSTIN */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-[#57534E] mb-1">
+                  Legal GSTIN Number
+                </label>
+                <input
+                  type="text"
+                  value={printerForm.gstin || ''}
+                  onChange={(e) =>
+                    setPrinterForm((prev) => ({ ...prev, gstin: e.target.value }))
+                  }
+                  placeholder="29AABCT1337C1Z0"
+                  className="w-full px-3 py-2 text-xs font-mono font-bold rounded-xl border border-[#E9E0D6] bg-white focus:border-[#F97316] focus:outline-hidden"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#57534E] mb-1">
+                  Custom Receipt Header Note
+                </label>
+                <input
+                  type="text"
+                  value={printerForm.receipt_header || ''}
+                  onChange={(e) =>
+                    setPrinterForm((prev) => ({ ...prev, receipt_header: e.target.value }))
+                  }
+                  placeholder="Welcome to TSOS Cafe & Roastery"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-[#E9E0D6] bg-white focus:border-[#F97316] focus:outline-hidden"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#57534E] mb-1">
+                  Custom Receipt Footer Note
+                </label>
+                <input
+                  type="text"
+                  value={printerForm.receipt_footer || ''}
+                  onChange={(e) =>
+                    setPrinterForm((prev) => ({ ...prev, receipt_footer: e.target.value }))
+                  }
+                  placeholder="Thank you for dining with us! ✨"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-[#E9E0D6] bg-white focus:border-[#F97316] focus:outline-hidden"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <button
+                type="submit"
+                className="px-5 py-2.5 rounded-xl bg-[#F97316] hover:bg-[#EA580C] text-white text-xs font-bold shadow-xs transition-colors"
+              >
+                Save Printer Configuration
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* 2. DEDICATED HARDWARE INTEGRATION & NATIVE CLIENT DOWNLOADS */}
+        <div className="bg-white rounded-3xl border border-[#E9E0D6] p-6 shadow-xs space-y-4">
+          <div className="flex items-center justify-between border-b border-[#F5F0EB] pb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                <Monitor className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-bold text-sm text-[#1C1917] flex items-center gap-2">
+                  <span>Hardware Integration & Native Client Downloads</span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 font-bold">
+                    Windows • Android • ESC/POS
+                  </span>
+                </h3>
+                <p className="text-xs text-[#57534E]">
+                  Install native desktop terminals for counter billing and mobile APKs for tableside order taking.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsHardwareDownloadsOpen(true)}
+              className="px-3.5 py-1.5 rounded-xl bg-[#1C1917] hover:bg-black text-white text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
+            >
+              <Download className="w-3.5 h-3.5 text-[#F97316]" />
+              <span>Download Hub</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <div className="p-3.5 rounded-2xl border border-[#E9E0D6] bg-[#FFF9F2] space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="font-bold text-[#1C1917] flex items-center gap-1.5">
+                  <Monitor className="w-4 h-4 text-blue-600" />
+                  <span>Windows POS Terminal (.exe)</span>
+                </div>
+                <span className="text-[10px] font-mono font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-md">WPF .NET 9</span>
+              </div>
+              <p className="text-[11px] text-[#57534E]">
+                Direct COM-port cash drawer kick, raw serial ESC/POS thermal printing without browser dialogue, and zero-latency bump bars.
+              </p>
+              <button
+                type="button"
+                onClick={() => setIsHardwareDownloadsOpen(true)}
+                className="w-full py-2 rounded-xl bg-white border border-[#E9E0D6] hover:bg-[#F5F0EB] text-[#1C1917] font-semibold text-xs flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5 text-blue-600" />
+                <span>Get Windows Setup (.exe)</span>
+              </button>
+            </div>
+
+            <div className="p-3.5 rounded-2xl border border-[#E9E0D6] bg-[#FFF9F2] space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="font-bold text-[#1C1917] flex items-center gap-1.5">
+                  <Smartphone className="w-4 h-4 text-emerald-600" />
+                  <span>Android Waiter / Captain App (.apk)</span>
+                </div>
+                <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md">Jetpack Compose</span>
+              </div>
+              <p className="text-[11px] text-[#57534E]">
+                Pocket tableside ordering, floor table statuses, instant KDS bump alerts, and line-busting mobile payments.
+              </p>
+              <button
+                type="button"
+                onClick={() => setIsHardwareDownloadsOpen(true)}
+                className="w-full py-2 rounded-xl bg-white border border-[#E9E0D6] hover:bg-[#F5F0EB] text-[#1C1917] font-semibold text-xs flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Get Android APK</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* 3. Zero-Subscription Fee Engine Settings */}
+        <div className="bg-white rounded-3xl border border-[#E9E0D6] p-6 shadow-xs space-y-4">
+          <div className="flex items-center gap-2 border-b border-[#F5F0EB] pb-3">
+            <Zap className="w-5 h-5 text-[#F97316]" />
+            <div>
+              <h3 className="font-bold text-sm text-[#1C1917]">
+                TSOS Zero-Subscription Fee Engine
+              </h3>
+              <p className="text-xs text-[#57534E]">
+                Configured at ₹1 per order with zero upfront or monthly software commitments.
+              </p>
+            </div>
+          </div>
+
+          {savedSuccess && (
+            <div className="p-3 bg-emerald-50 text-emerald-900 border border-emerald-200 rounded-xl text-xs flex items-center gap-2">
+              <Check className="w-4 h-4 text-emerald-600" />
+              <span>Fee engine configuration saved successfully.</span>
+            </div>
+          )}
+
+          <form onSubmit={handleSaveFeeConfig} className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-[#57534E] mb-1">
+                  Monthly Subscription Fee
+                </label>
+                <div className="px-3 py-2 text-sm font-mono font-bold bg-[#F5F0EB] rounded-xl border border-[#E9E0D6] text-[#17803D]">
+                  ₹0 / month (Lifetime Free)
+                </div>
+                <div className="text-[11px] text-[#A8A29E] mt-1">
+                  No hidden monthly software fees or rental contracts.
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#57534E] mb-1">
+                  Per-Order Platform Fee (₹)
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  step={0.25}
+                  value={perOrderFee}
+                  onChange={(e) => setPerOrderFee(Number(e.target.value) || 0)}
+                  className="w-full px-3 py-2 text-sm font-mono font-bold rounded-xl border border-[#E9E0D6] bg-white focus:border-[#F97316] focus:outline-hidden"
+                />
+                <div className="text-[11px] text-[#A8A29E] mt-1">
+                  Default is ₹1.00 per completed sale.
+                </div>
+              </div>
+            </div>
+
+            {/* Fee Payer Toggle */}
+            <div className="p-4 rounded-xl bg-[#FFF9F2] border border-[#E9E0D6] space-y-3">
+              <div className="text-xs font-semibold text-[#1C1917]">Who Pays the Platform Fee?</div>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setFeePayer('cafe')}
+                  className={`p-3 rounded-xl border text-left transition-all ${
+                    feePayer === 'cafe'
+                      ? 'border-[#F97316] bg-[#FFF1E6] ring-1 ring-[#F97316]'
+                      : 'border-[#E9E0D6] bg-white hover:bg-[#F5F0EB]'
+                  }`}
+                >
+                  <div className="font-bold text-xs text-[#1C1917]">Absorbed by Cafe</div>
+                  <div className="text-[11px] text-[#57534E] mt-0.5">
+                    Customer bill stays clean; ₹1 fee is absorbed as an operating expense.
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setFeePayer('customer')}
+                  className={`p-3 rounded-xl border text-left transition-all ${
+                    feePayer === 'customer'
+                      ? 'border-[#F97316] bg-[#FFF1E6] ring-1 ring-[#F97316]'
+                      : 'border-[#E9E0D6] bg-white hover:bg-[#F5F0EB]'
+                  }`}
+                >
+                  <div className="font-bold text-xs text-[#1C1917]">Paid by Customer</div>
+                  <div className="text-[11px] text-[#57534E] mt-0.5">
+                    +₹1 platform fee itemized directly on customer invoice/receipt.
+                  </div>
+                </button>
+              </div>
+
+              {/* Auto-flip rule */}
+              <div className="pt-2 border-t border-[#E9E0D6]">
+                <label className="flex items-start gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={autoFlipEnabled}
+                    onChange={(e) => setAutoFlipEnabled(e.target.checked)}
+                    className="mt-0.5 rounded-sm text-[#F97316] focus:ring-0"
+                  />
+                  <div>
+                    <span className="text-xs font-semibold text-[#1C1917]">
+                      Enable Auto-Flip Fee Engine
+                    </span>
+                    <p className="text-[11px] text-[#57534E] leading-relaxed">
+                      Automatically switch fee payer from "Cafe" to "Customer" after a promotional trial period.
+                    </p>
+                  </div>
+                </label>
+
+                {autoFlipEnabled && (
+                  <div className="mt-3 flex items-center gap-3 pl-5">
+                    <span className="text-xs text-[#57534E]">Flip threshold:</span>
+                    <input
+                      type="number"
+                      min={10}
+                      value={autoFlipThreshold}
+                      onChange={(e) => setAutoFlipThreshold(Number(e.target.value) || 100)}
+                      className="w-24 px-2 py-1 text-xs font-mono font-bold rounded-lg border border-[#E9E0D6]"
+                    />
+                    <span className="text-xs text-[#57534E]">
+                      orders ({feeConfig.period_order_count} of {autoFlipThreshold} completed)
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                className="px-5 py-2.5 rounded-xl bg-[#F97316] hover:bg-[#EA580C] text-white text-xs font-semibold shadow-xs"
+              >
+                Save Fee Engine Settings
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* 3. Staff Accounts & Role Switcher */}
+        <div className="bg-white rounded-3xl border border-[#E9E0D6] p-6 shadow-xs space-y-4">
+          <div className="flex items-center gap-2 border-b border-[#F5F0EB] pb-3">
+            <Users className="w-5 h-5 text-[#57534E]" />
+            <div>
+              <h3 className="font-bold text-sm text-[#1C1917]">Staff Accounts & Quick Role Switch</h3>
+              <p className="text-xs text-[#57534E]">
+                Simulate role-based access for Owner, Cashier, and Kitchen staff
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {SEED_PROFILES.map((p) => {
+              const isCurrent = currentProfile.id === p.id;
+              return (
+                <div
+                  key={p.id}
+                  className={`p-3.5 rounded-xl border transition-all ${
+                    isCurrent
+                      ? 'border-[#1C1917] bg-[#F5F0EB] ring-1 ring-[#1C1917]'
+                      : 'border-[#E9E0D6] bg-white hover:bg-[#FAFAFA]'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-bold text-xs capitalize text-[#1C1917]">{p.role}</span>
+                    <span className="text-[10px] font-mono bg-[#E9E0D6] px-1.5 py-0.2 rounded-md">
+                      PIN: {p.pin_code}
+                    </span>
+                  </div>
+                  <div className="text-xs font-semibold text-[#1C1917]">{p.name}</div>
+                  <div className="text-[11px] text-[#57534E] font-mono">{p.email}</div>
+
+                  <button
+                    onClick={() => setCurrentProfile(p)}
+                    disabled={isCurrent}
+                    className={`w-full mt-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                      isCurrent
+                        ? 'bg-[#1C1917] text-white cursor-default'
+                        : 'bg-white border border-[#E9E0D6] hover:bg-[#E9E0D6] text-[#57534E]'
+                    }`}
+                  >
+                    {isCurrent ? 'Active User' : 'Switch to This Staff'}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 4. Location & Cafe Profile */}
+        <div className="bg-white rounded-3xl border border-[#E9E0D6] p-6 shadow-xs space-y-3">
+          <div className="flex items-center gap-2 border-b border-[#F5F0EB] pb-3">
+            <Building className="w-5 h-5 text-[#57534E]" />
+            <h3 className="font-bold text-sm text-[#1C1917]">Cafe Location & Legal Profile</h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div>
+              <span className="text-[#57534E]">Location Name:</span>
+              <div className="font-bold text-[#1C1917] text-sm">{location.name}</div>
+            </div>
+            <div>
+              <span className="text-[#57534E]">Public Slug:</span>
+              <div className="font-mono font-bold text-[#F97316]">/storefront/{location.slug}</div>
+            </div>
+            <div>
+              <span className="text-[#57534E]">Registered Address:</span>
+              <div className="text-[#1C1917]">{location.address}</div>
+            </div>
+            <div>
+              <span className="text-[#57534E]">Official Phone:</span>
+              <div className="font-mono text-[#1C1917]">{location.phone}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* 5. Reset Demo Data */}
+        <div className="p-5 bg-[#FEF2F2] rounded-3xl border border-[#FECACA] flex items-center justify-between">
+          <div>
+            <h4 className="font-bold text-xs text-[#B42318]">Reset All Demo Data</h4>
+            <p className="text-[11px] text-[#B42318]/80">
+              Restore default demo cafe items, initial coffee/tea inventory, sample orders, and tables.
+            </p>
+          </div>
+          <button
+            onClick={() => {
+              if (window.confirm('Reset all demo cafe data to initial factory state?')) {
+                resetToSeed();
+              }
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#FECACA] text-xs font-semibold text-[#B42318] hover:bg-[#FEE2E2]"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span>Reset Demo</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Hardware Downloads Modal */}
+      <HardwareDownloadsModal
+        isOpen={isHardwareDownloadsOpen}
+        onClose={() => setIsHardwareDownloadsOpen(false)}
+      />
+    </div>
+  );
+};

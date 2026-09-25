@@ -1,0 +1,25 @@
+# TSOS Architecture Decision Records (ADRs)
+
+This directory documents all key architectural decisions made in the development of the **TSOS Multi-Tenant Cafe Operating System**.
+
+---
+
+## Index of Decisions
+
+| ADR Number | Title | Status | Date |
+|---|---|---|---|
+| **[ADR 0001](0001-supabase-multi-tenant-architecture.md)** | Supabase Multi-Tenant Architecture | Accepted | 2026-09-25 |
+| **[ADR 0002](0002-rls-tenant-isolation-model.md)** | Row-Level Security (RLS) Tenant Isolation Model | Accepted | 2026-09-25 |
+| **[ADR 0003](0003-production-chrome-purge-and-dynamic-routing.md)** | Production Chrome Purge and Dynamic Scoped Routing | Accepted | 2026-09-25 |
+| **[ADR 0004](0004-obsidian-terminal-theme-engine.md)** | Obsidian Terminal Theme Engine | Accepted | 2026-09-25 |
+| **[ADR 0005](0005-ephemeral-table-qr-session-security.md)** | 10-Minute Ephemeral Table QR Session Security | Accepted | 2026-09-25 |
+| **[ADR 0006](0006-realtime-websockets-and-selective-migration.md)** | Real-Time WebSockets & Selective Architectural Migration | Accepted | 2026-09-25 |
+
+---
+
+## Architectural Decision Framework
+
+Each ADR follows the standard format:
+1. **Context**: Why the decision was needed and what problem we faced.
+2. **Decision**: What architectural or engineering choice was implemented.
+3. **Consequences**: Positive benefits and negative trade-offs of the decision.
