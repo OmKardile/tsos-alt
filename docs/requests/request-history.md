@@ -148,5 +148,14 @@ This document maintains an exact, comprehensive chronological ledger of all user
 - **Core Directive**: "how about render" — evaluate and configure Render (render.com) for production deployment of TSOS.
 - **Resolution**: Evaluated Render vs. Vercel for the TSOS React/Vite SPA and Supabase backend. Established that Render Static Site is 100% free with zero cold starts / zero sleep downtime. Implemented `render.yaml` Blueprint with `npm install && npm run build`, `./dist` publish path, client-side routing rewrite rule (`/* -> /index.html`), and pre-configured Supabase environment variables. Documented 1-click Blueprint and manual dashboard deployment procedures in `help.md`, `README.md`, `CHANGELOG.md`, `technical-documentation.md`, and ADR 0008. Verified production build compiles in 8.22s with 0 errors.
 
+---
+
+## Request 17: GitHub Remote Publishing & Author Attribution
+
+- **Timestamp**: 2026-09-25T15:35:00Z
+- **Core Directive**: Configure remote repository `https://github.com/OmKardile/tsos-alt.git`, set local author to `Omkar Kardile <omkardile84@gmail.com>`, ensure sequential commit history, and push.
+- **Resolution**: Configured local Git identity (`user.name "Omkar Kardile"`, `user.email "omkardile84@gmail.com"`). Re-authored all 5 commits to guarantee proper GitHub contribution credit. Approved GitHub authentication token via Windows Credential Manager. Successfully pushed both `master` and `main` branches to `https://github.com/OmKardile/tsos-alt.git`.
+
+
 
 
