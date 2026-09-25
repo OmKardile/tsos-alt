@@ -460,7 +460,7 @@ export const KdsScreen: React.FC = () => {
                 Kitchen Display System (KDS)
               </h2>
               <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-[#27272A] text-zinc-400 border border-[#3F3F46]">
-                Obsidian Mode
+                Kitchen Display
               </span>
               {criticalOrdersCount > 0 && (
                 <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-950 text-rose-300 border border-rose-600 flex items-center gap-1 animate-pulse">

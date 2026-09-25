@@ -47,6 +47,7 @@ export const Header: React.FC<HeaderProps> = ({ onSignOut }) => {
   const [isStaffPinOpen, setIsStaffPinOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const roleMeta = getRoleMeta(currentProfile?.role);
+  const isDark = themeMode === 'dark' || themeMode === 'obsidian';
 
   // Close profile menu when clicking outside
   useEffect(() => {
@@ -165,26 +166,26 @@ export const Header: React.FC<HeaderProps> = ({ onSignOut }) => {
               {audioEnabled ? <Volume2 className="w-3.5 h-3.5 text-[#16A34A]" /> : <VolumeX className="w-3.5 h-3.5 text-[#A8A29E]" />}
             </button>
 
-            {/* Obsidian Dark Mode Global Toggle */}
+            {/* Dark Mode Global Toggle */}
             <button
               type="button"
               onClick={toggleThemeMode}
-              title={themeMode === 'obsidian' ? 'Switch entire system to Warm Bakery Light Theme' : 'Switch entire system to Obsidian Ultra-Dark Mode'}
+              title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
-                themeMode === 'obsidian'
-                  ? 'bg-[#27272A] border-[#3F3F46] text-[#FDE047] hover:bg-[#3F3F46] shadow-xs'
+                isDark
+                  ? 'bg-[#27272A] border-[#3F3F46] text-amber-300 hover:bg-[#3F3F46]'
                   : 'bg-white border-[#E9E0D6] text-[#57534E] hover:text-[#1C1917] hover:bg-[#FFF9F2]'
               }`}
             >
-              {themeMode === 'obsidian' ? (
+              {isDark ? (
                 <>
-                  <Sun className="w-3.5 h-3.5 text-[#FDE047]" />
-                  <span className="hidden md:inline font-bold text-[#FDE047]">Warm Mode</span>
+                  <Sun className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="hidden md:inline font-bold text-amber-300">Light Mode</span>
                 </>
               ) : (
                 <>
-                  <Moon className="w-3.5 h-3.5 text-[#7C3AED]" />
-                  <span className="hidden md:inline font-bold text-[#1C1917]">Obsidian Mode</span>
+                  <Moon className="w-3.5 h-3.5 text-slate-700" />
+                  <span className="hidden md:inline font-bold text-[#1C1917]">Dark Mode</span>
                 </>
               )}
             </button>
@@ -221,7 +222,7 @@ export const Header: React.FC<HeaderProps> = ({ onSignOut }) => {
                 type="button"
                 onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                 className={`flex items-center gap-2 pl-2 pr-2.5 py-1 rounded-xl border transition-all cursor-pointer ${
-                  themeMode === 'obsidian'
+                  isDark
                     ? 'bg-stone-900 border-stone-800 text-stone-200 hover:bg-stone-800'
                     : 'bg-[#FFF9F2] border-[#E9E0D6] text-[#1C1917] hover:bg-[#FFF1E6]'
                 }`}
@@ -251,19 +252,19 @@ export const Header: React.FC<HeaderProps> = ({ onSignOut }) => {
               {/* Profile Dropdown Menu */}
               {isProfileMenuOpen && (
                 <div className={`absolute right-0 mt-2 w-64 rounded-2xl shadow-xl border z-50 p-2 text-xs animate-in fade-in slide-in-from-top-2 ${
-                  themeMode === 'obsidian'
+                  isDark
                     ? 'bg-stone-900 border-stone-800 text-stone-200'
                     : 'bg-white border-[#E9E0D6] text-[#1C1917]'
                 }`}>
                   <div className={`p-3 rounded-xl mb-2 border ${
-                    themeMode === 'obsidian'
+                    isDark
                       ? 'bg-stone-800/80 border-stone-700'
                       : 'bg-[#FFF9F2] border-[#E9E0D6]'
                   }`}>
                     <div className="font-bold text-sm">{currentProfile.name}</div>
                     <div className="text-[11px] mt-1 flex items-center gap-1.5">
                       <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold border ${
-                        themeMode === 'obsidian' ? roleMeta.badgeDarkClass : roleMeta.badgeClass
+                        isDark ? roleMeta.badgeDarkClass : roleMeta.badgeClass
                       }`}>
                         {roleMeta.roleLabel}
                       </span>

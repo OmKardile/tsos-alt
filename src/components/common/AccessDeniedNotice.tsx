@@ -29,7 +29,7 @@ export const AccessDeniedNotice: React.FC<AccessDeniedNoticeProps> = ({
 }) => {
   const { currentProfile, setActiveWebTab, themeMode, currentTenant } = useTsosStore();
   const roleMeta = getRoleMeta(currentProfile.role);
-  const isObsidian = themeMode === 'obsidian';
+  const isDark = themeMode === 'dark' || themeMode === 'obsidian';
 
   const handleReturnToPos = () => {
     setActiveWebTab('pos');
@@ -40,10 +40,10 @@ export const AccessDeniedNotice: React.FC<AccessDeniedNoticeProps> = ({
   };
 
   return (
-    <div className={`min-h-[70vh] flex items-center justify-center p-6 ${isObsidian ? 'bg-[#0C0A09]' : 'bg-[#FFF9F2]'}`}>
+    <div className={`min-h-[70vh] flex items-center justify-center p-6 ${isDark ? 'bg-[#09090B]' : 'bg-[#FFF9F2]'}`}>
       <div className={`max-w-md w-full p-8 rounded-3xl border shadow-xl text-center animate-in fade-in zoom-in-95 duration-200 ${
-        isObsidian 
-          ? 'bg-[#1C1917] border-[#292524] text-stone-200' 
+        isDark 
+          ? 'bg-[#18181B] border-[#27272A] text-zinc-100' 
           : 'bg-white border-[#E9E0D6] text-[#1C1917]'
       }`}>
         <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-500 flex items-center justify-center mx-auto mb-4">
@@ -54,7 +54,7 @@ export const AccessDeniedNotice: React.FC<AccessDeniedNoticeProps> = ({
           Access Restricted
         </h2>
 
-        <p className={`text-sm mb-6 ${isObsidian ? 'text-stone-400' : 'text-[#78716C]'}`}>
+        <p className={`text-sm mb-6 ${isDark ? 'text-zinc-400' : 'text-[#78716C]'}`}>
           Your current active profile is logged in as{' '}
           <span className="font-semibold text-amber-500">{roleMeta.roleLabel}</span>. 
           Access to <span className="font-semibold underline">{TAB_NAMES[attemptedTab] || attemptedTab}</span> requires Manager or Owner privileges.
@@ -65,8 +65,8 @@ export const AccessDeniedNotice: React.FC<AccessDeniedNoticeProps> = ({
             type="button"
             onClick={handleReturnToPos}
             className={`w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-medium text-sm transition-all ${
-              isObsidian
-                ? 'bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-700'
+              isDark
+                ? 'bg-[#27272A] hover:bg-[#3F3F46] text-zinc-200 border border-[#3F3F46]'
                 : 'bg-[#F5F0EB] hover:bg-[#EFE8E1] text-[#57534E]'
             }`}
           >

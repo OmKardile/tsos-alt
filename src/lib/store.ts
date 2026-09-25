@@ -248,7 +248,7 @@ const STORAGE_KEY = 'tsos_app_state_v1';
 const DEFAULT_STATE = {
   activeSurface: 'web' as ActiveSurface,
   activeWebTab: 'pos' as WebTab,
-  themeMode: (typeof window !== 'undefined' && localStorage.getItem('tsos_theme_mode') === 'obsidian' ? 'obsidian' : 'warm') as ThemeMode,
+  themeMode: (typeof window !== 'undefined' && (localStorage.getItem('tsos_theme_mode') === 'dark' || localStorage.getItem('tsos_theme_mode') === 'obsidian') ? 'dark' : 'warm') as ThemeMode,
   tenantBusinesses: INITIAL_TENANT_BUSINESSES,
   platformAuditLogs: INITIAL_PLATFORM_AUDIT_LOGS,
   activeSuperAdminTab: 'dashboard' as const,
@@ -467,22 +467,25 @@ export const useTsosStore = create<TsosState>((set, get) => ({
   setActiveSurface: (surface) => set({ activeSurface: surface }),
   setActiveWebTab: (tab) => set({ activeWebTab: tab }),
 
-  themeMode: (typeof window !== 'undefined' && localStorage.getItem('tsos_theme_mode') === 'obsidian' ? 'obsidian' : 'warm') as ThemeMode,
+  themeMode: (typeof window !== 'undefined' && (localStorage.getItem('tsos_theme_mode') === 'dark' || localStorage.getItem('tsos_theme_mode') === 'obsidian') ? 'dark' : 'warm') as ThemeMode,
   setThemeMode: (mode) => {
+    const isDark = mode === 'dark' || mode === 'obsidian';
+    const effectiveMode: ThemeMode = isDark ? 'dark' : 'warm';
     if (typeof window !== 'undefined') {
-      localStorage.setItem('tsos_theme_mode', mode);
-      document.documentElement.setAttribute('data-theme', mode);
-      if (mode === 'obsidian') {
-        document.documentElement.classList.add('obsidian');
+      localStorage.setItem('tsos_theme_mode', effectiveMode);
+      document.documentElement.setAttribute('data-theme', effectiveMode);
+      if (isDark) {
+        document.documentElement.classList.add('dark', 'obsidian');
       } else {
-        document.documentElement.classList.remove('obsidian');
+        document.documentElement.classList.remove('dark', 'obsidian');
       }
     }
-    set({ themeMode: mode });
+    set({ themeMode: effectiveMode });
   },
   toggleThemeMode: () => {
-    const nextMode = get().themeMode === 'obsidian' ? 'warm' : 'obsidian';
-    get().setThemeMode(nextMode);
+    const current = get().themeMode;
+    const isDark = current === 'dark' || current === 'obsidian';
+    get().setThemeMode(isDark ? 'warm' : 'dark');
   },
 
   setCurrentProfile: (profile) =>

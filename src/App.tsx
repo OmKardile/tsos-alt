@@ -57,11 +57,12 @@ export default function App() {
   // Sync theme mode to document element
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      document.documentElement.setAttribute('data-theme', themeMode);
-      if (themeMode === 'obsidian') {
-        document.documentElement.classList.add('obsidian');
+      const isDark = themeMode === 'dark' || themeMode === 'obsidian';
+      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'warm');
+      if (isDark) {
+        document.documentElement.classList.add('dark', 'obsidian');
       } else {
-        document.documentElement.classList.remove('obsidian');
+        document.documentElement.classList.remove('dark', 'obsidian');
       }
     }
   }, [themeMode]);
@@ -354,10 +355,12 @@ export default function App() {
     }
   };
 
+  const isDarkTheme = themeMode === 'dark' || themeMode === 'obsidian';
+
   return (
     <div
       className={`min-h-screen ${
-        themeMode === 'obsidian' ? 'bg-[#0C0A09] text-[#FAFAFA]' : 'bg-[#FFF9F2] text-[#1C1917]'
+        isDarkTheme ? 'bg-[#09090B] text-[#F4F4F5]' : 'bg-[#FFF9F2] text-[#1C1917]'
       } flex flex-col font-sans transition-colors duration-200`}
     >
       <Header onSignOut={handleSignOut} />
