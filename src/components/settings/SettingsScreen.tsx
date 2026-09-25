@@ -22,9 +22,6 @@ import {
   Sparkles,
   HelpCircle,
   FileCheck2,
-  Monitor,
-  Download,
-  Smartphone,
 } from 'lucide-react';
 import {
   generateTestReceiptEscPos,
@@ -32,7 +29,6 @@ import {
   printViaBluetooth,
 } from '../../lib/printerService';
 import { GuidanceTooltip } from '../common/GuidanceTooltip';
-import { HardwareDownloadsModal } from '../common/HardwareDownloadsModal';
 
 export const SettingsScreen: React.FC = () => {
   const {
@@ -52,7 +48,6 @@ export const SettingsScreen: React.FC = () => {
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [printerSavedSuccess, setPrinterSavedSuccess] = useState(false);
   const [testPrintFeedback, setTestPrintFeedback] = useState<string | null>(null);
-  const [isHardwareDownloadsOpen, setIsHardwareDownloadsOpen] = useState(false);
 
   // Fee engine form state
   const [feePayer, setFeePayer] = useState(feeConfig.default_fee_payer);
@@ -127,14 +122,6 @@ export const SettingsScreen: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setIsHardwareDownloadsOpen(true)}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#1C1917] hover:bg-black text-white text-xs font-bold shadow-2xs transition-colors cursor-pointer"
-            >
-              <Download className="w-4 h-4 text-[#F97316]" />
-              <span>Hardware & Downloads</span>
-            </button>
             <button
               type="button"
               onClick={startTour}
@@ -504,80 +491,6 @@ export const SettingsScreen: React.FC = () => {
           </form>
         </div>
 
-        {/* 2. DEDICATED HARDWARE INTEGRATION & NATIVE CLIENT DOWNLOADS */}
-        <div className="bg-white rounded-3xl border border-[#E9E0D6] p-6 shadow-xs space-y-4">
-          <div className="flex items-center justify-between border-b border-[#F5F0EB] pb-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                <Monitor className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-bold text-sm text-[#1C1917] flex items-center gap-2">
-                  <span>Hardware Integration & Native Client Downloads</span>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 font-bold">
-                    Windows • Android • ESC/POS
-                  </span>
-                </h3>
-                <p className="text-xs text-[#57534E]">
-                  Install native desktop terminals for counter billing and mobile APKs for tableside order taking.
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => setIsHardwareDownloadsOpen(true)}
-              className="px-3.5 py-1.5 rounded-xl bg-[#1C1917] hover:bg-black text-white text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
-            >
-              <Download className="w-3.5 h-3.5 text-[#F97316]" />
-              <span>Download Hub</span>
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-            <div className="p-3.5 rounded-2xl border border-[#E9E0D6] bg-[#FFF9F2] space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="font-bold text-[#1C1917] flex items-center gap-1.5">
-                  <Monitor className="w-4 h-4 text-blue-600" />
-                  <span>Windows POS Terminal (.exe)</span>
-                </div>
-                <span className="text-[10px] font-mono font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-md">WPF .NET 9</span>
-              </div>
-              <p className="text-[11px] text-[#57534E]">
-                Direct COM-port cash drawer kick, raw serial ESC/POS thermal printing without browser dialogue, and zero-latency bump bars.
-              </p>
-              <button
-                type="button"
-                onClick={() => setIsHardwareDownloadsOpen(true)}
-                className="w-full py-2 rounded-xl bg-white border border-[#E9E0D6] hover:bg-[#F5F0EB] text-[#1C1917] font-semibold text-xs flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                <Download className="w-3.5 h-3.5 text-blue-600" />
-                <span>Get Windows Setup (.exe)</span>
-              </button>
-            </div>
-
-            <div className="p-3.5 rounded-2xl border border-[#E9E0D6] bg-[#FFF9F2] space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="font-bold text-[#1C1917] flex items-center gap-1.5">
-                  <Smartphone className="w-4 h-4 text-emerald-600" />
-                  <span>Android Waiter / Captain App (.apk)</span>
-                </div>
-                <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md">Jetpack Compose</span>
-              </div>
-              <p className="text-[11px] text-[#57534E]">
-                Pocket tableside ordering, floor table statuses, instant KDS bump alerts, and line-busting mobile payments.
-              </p>
-              <button
-                type="button"
-                onClick={() => setIsHardwareDownloadsOpen(true)}
-                className="w-full py-2 rounded-xl bg-white border border-[#E9E0D6] hover:bg-[#F5F0EB] text-[#1C1917] font-semibold text-xs flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                <Download className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Get Android APK</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
         {/* 3. Zero-Subscription Fee Engine Settings */}
         <div className="bg-white rounded-3xl border border-[#E9E0D6] p-6 shadow-xs space-y-4">
           <div className="flex items-center gap-2 border-b border-[#F5F0EB] pb-3">
@@ -812,12 +725,6 @@ export const SettingsScreen: React.FC = () => {
           </button>
         </div>
       </div>
-
-      {/* Hardware Downloads Modal */}
-      <HardwareDownloadsModal
-        isOpen={isHardwareDownloadsOpen}
-        onClose={() => setIsHardwareDownloadsOpen(false)}
-      />
     </div>
   );
 };

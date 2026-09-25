@@ -1,3 +1,15 @@
+/**
+ * ============================================================================
+ * [FROZEN / DEPRECATED] TSOS Native Windows (WPF / .NET) Client
+ * ============================================================================
+ * ARCHITECTURAL DIRECTIVE:
+ * The standalone C# / WPF native client has been FROZEN.
+ * Desktop operations will focus exclusively on an Electron.js wrapper
+ * around the web POS terminal for unified cross-platform hardware access
+ * (Raw ESC/POS WebUSB/WebSerial, cash drawers, and offline SQLite caching).
+ * ============================================================================
+ */
+
 import React, { useState } from 'react';
 import { useTsosStore } from '../../lib/store';
 import { PosScreen } from '../pos/PosScreen';
@@ -19,6 +31,7 @@ import {
   CheckCircle2,
   RefreshCw,
   Sliders,
+  AlertTriangle,
 } from 'lucide-react';
 
 export const WindowsAppClient: React.FC = () => {

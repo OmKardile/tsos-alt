@@ -10,9 +10,7 @@ import {
   ChevronDown,
   User,
   Building,
-  Monitor,
   Sparkles,
-  Download,
   Moon,
   Sun,
 } from 'lucide-react';
@@ -21,10 +19,9 @@ import { StaffPinPadModal } from '../auth/StaffPinPadModal';
 
 interface HeaderProps {
   onSignOut?: () => void;
-  onOpenHardwareDownloads?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onSignOut, onOpenHardwareDownloads }) => {
+export const Header: React.FC<HeaderProps> = ({ onSignOut }) => {
   const {
     location,
     setLocation,
@@ -247,26 +244,6 @@ export const Header: React.FC<HeaderProps> = ({ onSignOut, onOpenHardwareDownloa
                       <div className="flex-1">
                         <div className="font-semibold">Switch Staff PIN</div>
                         <div className="text-[10px] text-[#78716C]">Change cashier for shifts</div>
-                      </div>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsProfileMenuOpen(false);
-                        if (onOpenHardwareDownloads) {
-                          onOpenHardwareDownloads();
-                        } else {
-                          setActiveSurface('web');
-                          setActiveWebTab('settings');
-                        }
-                      }}
-                      className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-left hover:bg-[#F5F0EB] text-[#1C1917] transition-colors"
-                    >
-                      <Monitor className="w-4 h-4 text-[#57534E]" />
-                      <div className="flex-1">
-                        <div className="font-semibold">Hardware & Downloads</div>
-                        <div className="text-[10px] text-[#78716C]">Windows & Android clients</div>
                       </div>
                     </button>
 

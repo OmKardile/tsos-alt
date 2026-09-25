@@ -231,28 +231,30 @@ The application maintains persistent PostgreSQL change subscriptions per tenant 
 
 ---
 
-## 9. Hardware Hub & Touchscreen Shift Keypad
+## 9. Touchscreen Shift Keypad & Desktop Electron Architecture
 
-### 9.1 Hardware Client Hub (`HardwareDownloadsModal`)
-Exposes direct installer downloads and connection endpoints for peripheral devices:
-- **Windows Desktop POS**: C# / WPF native installer (`TSOS-Terminal-Setup-v2.exe`).
-- **Android Tablet Client**: Kotlin / Jetpack Compose APK (`TSOS-Storefront-v2.apk`).
-- **ESC/POS Thermal Printing**: USB / Network raw socket protocol specifications.
-
-### 9.2 Fast Touchscreen PIN Pad (`StaffPinPadModal`)
+### 9.1 Fast Touchscreen PIN Pad (`StaffPinPadModal`)
 - On-screen 4-digit keypad designed for tablet cashiers and baristas.
 - Enables rapid 2-tap clock-ins and shift handovers during high-volume service rushes.
 
+### 9.2 Strategic Desktop Roadmap: Electron.js Transition
+- **Windows WPF Frozen**: Standalone C# / WPF native desktop client is frozen.
+- **Electron.js Framework**: Desktop POS terminals will leverage cross-platform Electron.js wrapping the unified React/TypeScript POS codebase to access raw USB/COM ESC/POS thermal printers and cash drawers.
+- **Zero-Install Camera QR Ordering**: Cancelled customer native apps. Diners scan physical QR table stickers with their mobile camera; the storefront opens directly in the browser with 10-minute ephemeral sessions.
+
 ---
 
-## 10. Comparative Audit & Selective Migration Matrix
+## 10. Comparative Audit & Strategic Realignment Matrix
 
-| Capability | Reference Repo | Local Repo | Migration Action |
+| Capability | Reference Repo | Local Repo | Current Architecture Status |
 |---|---|---|---|
-| Realtime WebSockets | Yes | Previously Mock | **PORTED**: Implemented `realtimeService` WebSocket subscription. |
-| Offline Order Sync | Yes | In-memory | **PORTED**: Implemented `tsos_pending_offline_orders` queue & auto-flush. |
-| Hardware Downloads | Yes | Missing | **PORTED**: Added `HardwareDownloadsModal` in Header and Settings. |
-| Fast PIN Keypad | Yes | Missing | **PORTED**: Added `StaffPinPadModal` with 4-digit touchscreen pad. |
+| Realtime WebSockets | Yes | Previously Mock | **ACTIVE**: Implemented `realtimeService` WebSocket subscription. |
+| Offline Order Sync | Yes | In-memory | **ACTIVE**: Implemented `tsos_pending_offline_orders` queue & auto-flush. |
+| Fast PIN Keypad | Yes | Missing | **ACTIVE**: Added `StaffPinPadModal` with 4-digit touchscreen pad. |
+| 10m QR Session | Yes | Basic | **ACTIVE**: Full cryptographic dual-token session architecture. |
+| Hardware Hub Modal | Yes | Ported | **PURGED**: Removed modal & buttons per user directive. |
+| Native Windows App | WPF | WPF Prototype | **FROZEN**: Transitioned to Electron.js desktop POS shell. |
+| Native Customer App | Compose APK | Prototype | **CANCELLED**: Zero-install mobile browser camera QR flow. |
 | 10m QR Test Harness | Yes | Basic | **PORTED**: Added `[Expire (Test History)]` & `[Tamper]` buttons. |
 | Obsidian Theme Engine | Limited KDS | System-Wide | **KEPT LOCAL**: Retained superior full-system Obsidian Terminal mode. |
 | Multi-Tenant Schema | Split | Unified (24 tables) | **KEPT LOCAL**: Retained unified PostgreSQL schema and RLS policies. |

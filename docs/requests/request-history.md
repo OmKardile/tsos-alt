@@ -116,3 +116,28 @@ This document maintains an exact, comprehensive chronological ledger of all user
 - **Core Directive**: Resume what you were doing.
 - **Resolution**: Resolved remaining 4 TypeScript compilation errors in `KdsScreen.tsx`, `PosScreen.tsx`, and `ShiftsScreen.tsx`. Confirmed clean `npm run build` (8.04s), launched local dev server on port 3000, executed full browser subagent walkthrough, and updated all documentation suites.
 
+---
+
+## Request 13: Supabase Cluster Health Check
+
+- **Timestamp**: 2026-09-25T15:10:00Z
+- **Core Directive**: Check Supabase cluster health.
+- **Resolution**: Executed comprehensive automated health probe (`check-supabase-health.mjs`). Verified 2/2 microservices (Auth GoTrue, PostgREST), 13/13 database tables in public schema, 2/2 stored procedures (`purge_expired_table_sessions`, `issue_ephemeral_table_session`), Realtime WebSockets, and anonymous RLS access. All systems 100% operational with sub-100ms average table latency.
+
+---
+
+## Request 14: Production Deployment & Admin Credentials Help Guide
+
+- **Timestamp**: 2026-09-25T15:12:00Z
+- **Core Directive**: Deploy to live production URL (Vercel) and resolve invalid admin ID/password.
+- **Resolution**: Seeded confirmed user accounts via Supabase Admin API (`admin@tsos.dev`, `owner@coolkafe.com`, `manager@coolkafe.com`, `cashier@coolkafe.com`), added 4-button quick sign-in bar on `AuthScreen.tsx`, established live public tunnel, configured `vercel.json` for SPA rewrites, and documented complete deployment instructions in `help.md` at root.
+
+---
+
+## Request 15: Hardware Hub Purge, Windows WPF Freeze for Electron, Pure Camera QR Focus
+
+- **Timestamp**: 2026-09-25T15:25:00Z
+- **Core Directive**: Remove TSOS Hardware Hub & Native Clients totally; freeze native windows app in favor of Electron; cancel native customer app since customers just scan QR with phone camera and browser directly opens session.
+- **Resolution**: Completely deleted `HardwareDownloadsModal.tsx`, `AndroidAppClient.tsx`, removed all hardware download buttons and routes from `Header.tsx`, `SettingsScreen.tsx`, and `App.tsx`. Marked `WindowsAppClient.tsx` [FROZEN] in favor of Electron.js. Verified clean build (`npm run build` 10.85s, 0 errors).
+
+

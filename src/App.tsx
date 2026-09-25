@@ -27,7 +27,6 @@ import { OrderTrackingScreen } from './components/storefront/OrderTrackingScreen
 import { SuperAdminScreen } from './components/superadmin/SuperAdminScreen';
 import { AuthScreen } from './components/auth/AuthScreen';
 import { CafeOnboardingWizard } from './components/auth/CafeOnboardingWizard';
-import { HardwareDownloadsModal } from './components/common/HardwareDownloadsModal';
 import { WebTab } from './types';
 
 export default function App() {
@@ -63,7 +62,6 @@ export default function App() {
   }, [themeMode]);
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(false);
-  const [isHardwareDownloadsOpen, setIsHardwareDownloadsOpen] = useState<boolean>(false);
 
   // Check auth session on startup
   useEffect(() => {
@@ -124,12 +122,6 @@ export default function App() {
       // Route: /superadmin
       if (first === 'superadmin') {
         setActiveSurface('superadmin');
-        return;
-      }
-
-      // Route: /hardware
-      if (first === 'hardware') {
-        setIsHardwareDownloadsOpen(true);
         return;
       }
 
@@ -284,15 +276,8 @@ export default function App() {
   if (activeSurface === 'superadmin') {
     return (
       <>
-        <Header
-          onSignOut={handleSignOut}
-          onOpenHardwareDownloads={() => setIsHardwareDownloadsOpen(true)}
-        />
+        <Header onSignOut={handleSignOut} />
         <SuperAdminScreen />
-        <HardwareDownloadsModal
-          isOpen={isHardwareDownloadsOpen}
-          onClose={() => setIsHardwareDownloadsOpen(false)}
-        />
       </>
     );
   }
@@ -351,10 +336,7 @@ export default function App() {
         themeMode === 'obsidian' ? 'bg-[#0C0A09] text-[#FAFAFA]' : 'bg-[#FFF9F2] text-[#1C1917]'
       } flex flex-col font-sans transition-colors duration-200`}
     >
-      <Header
-        onSignOut={handleSignOut}
-        onOpenHardwareDownloads={() => setIsHardwareDownloadsOpen(true)}
-      />
+      <Header onSignOut={handleSignOut} />
 
       <div className="flex-1 flex flex-col min-h-0">
         <WebNavbar />
@@ -362,12 +344,6 @@ export default function App() {
           {renderWebContent()}
         </main>
       </div>
-
-      {/* Hardware Downloads & Client Apps Modal */}
-      <HardwareDownloadsModal
-        isOpen={isHardwareDownloadsOpen}
-        onClose={() => setIsHardwareDownloadsOpen(false)}
-      />
 
       {/* Cafe Onboarding Wizard Modal */}
       <CafeOnboardingWizard

@@ -116,5 +116,5 @@ graph LR
 1. **Integrated Soundbox & Payments**: Partner with domestic payment aggregators (Razorpay, Paytm, Cashfree) to ship branded UPI audio soundboxes for instant counter payment verification.
 2. **Direct Supplier Marketplace**: Allow coffee bean roasters and dairy distributors to accept automated purchase orders directly from TSOS low-stock notifications.
 3. **Franchise Analytics Intelligence**: Benchmark top-selling SKUs, hourly staffing efficiency, and prep SLA across all participating franchise outlets.
-4. **Hardware Flexibility & Zero Lock-in**: Offer turnkey Windows POS (.exe), Android Tablet APKs, and browser-first PWA clients so cafes can utilize existing hardware without buying expensive proprietary terminals.
+4. **Zero-Friction Hospitality Flow**: Eliminate native app installation barriers completely. Diners scan table QR stickers directly with their native smartphone camera to order in mobile browser tabs with 10-minute session security; counter terminals deploy on cross-platform Electron.js wrapping the web POS for direct USB/Serial thermal printing.
 

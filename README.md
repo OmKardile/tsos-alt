@@ -45,9 +45,10 @@
 - **Supabase Realtime**: Instantaneous zero-reload ticket progression in KDS and live dining table status updates.
 - **Offline-First Synchronization**: Caches pending tickets under `tsos_pending_offline_orders` with automated auto-flush upon browser reconnection.
 
-### 7. Hardware Hub & Touchscreen PIN Clock-In
-- **Hardware Integration Modal**: Direct download links for Windows Desktop POS (.exe), Android Tablet APK, and ESC/POS thermal printer guidelines.
-- **Fast 4-Digit Staff PIN Pad**: Touchscreen numeric pad for rapid 2-tap cashier and barista clock-ins.
+### 7. Touchscreen Fast PIN Pad & Electron Desktop Roadmap
+- **Fast 4-Digit Staff PIN Pad**: Touchscreen numeric pad for rapid 2-tap cashier and barista shift transitions.
+- **Electron.js Desktop Strategy**: The legacy Windows WPF app is frozen; desktop POS terminals will focus exclusively on cross-platform Electron wrapping the web POS.
+- **Pure Camera QR Browser Ordering**: Cancelled customer native apps; diners scan physical table QR stickers directly with their phone camera, immediately opening the web storefront in their mobile browser with 10-minute time-bound sessions.
 
 ---
 

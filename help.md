@@ -61,3 +61,11 @@ npx vercel --prod
    git push -u origin master
    ```
 3. Go to [vercel.com/new](https://vercel.com/new), select **Import Git Repository**, add the two `VITE_SUPABASE_*` environment variables, and click **Deploy**.
+
+---
+
+## 3. 📱 Client Architecture Policy
+
+- **Customer Tableside Ordering**: 100% Zero-install browser experience. Customers scan the physical table QR code with their phone camera $\rightarrow$ opens `https://<DOMAIN>/<SLUG>/t<TABLE>?token=<SECRET>` in their mobile browser $\rightarrow$ authenticates a 10-minute cryptographic session (`table_sessions`). No native app downloads needed.
+- **Desktop POS Terminals**: Native Windows WPF app is **FROZEN**. Desktop POS deployments focus on **Electron.js** wrapping the unified web POS terminal for cross-platform direct hardware access (raw ESC/POS WebUSB/WebSerial printers and cash drawers).
+

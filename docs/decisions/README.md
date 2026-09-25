@@ -14,6 +14,7 @@ This directory documents all key architectural decisions made in the development
 | **[ADR 0004](0004-obsidian-terminal-theme-engine.md)** | Obsidian Terminal Theme Engine | Accepted | 2026-09-25 |
 | **[ADR 0005](0005-ephemeral-table-qr-session-security.md)** | 10-Minute Ephemeral Table QR Session Security | Accepted | 2026-09-25 |
 | **[ADR 0006](0006-realtime-websockets-and-selective-migration.md)** | Real-Time WebSockets & Selective Architectural Migration | Accepted | 2026-09-25 |
+| **[ADR 0007](0007-remove-hardware-hub-and-cancel-native-apps.md)** | Removal of Hardware Hub, Freezing Windows for Electron & Browser QR Ordering | Accepted | 2026-09-25 |
 
 ---
 
