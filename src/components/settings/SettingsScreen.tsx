@@ -23,6 +23,7 @@ import {
   HelpCircle,
   FileCheck2,
 } from 'lucide-react';
+import { canPerformAction } from '../../lib/rbac';
 import {
   generateTestReceiptEscPos,
   triggerCashDrawerKick,
@@ -60,6 +61,11 @@ export const SettingsScreen: React.FC = () => {
 
   const handleSaveFeeConfig = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!canPerformAction(currentProfile?.role, 'edit_settings')) {
+      setTestPrintFeedback('Action Blocked: Only Cafe Owners and SuperAdmins can modify billing and fee configurations.');
+      setTimeout(() => setTestPrintFeedback(null), 4000);
+      return;
+    }
     updateFeeConfig({
       default_fee_payer: feePayer,
       per_order_fee: perOrderFee,
@@ -72,6 +78,11 @@ export const SettingsScreen: React.FC = () => {
 
   const handleSavePrinterConfig = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!canPerformAction(currentProfile?.role, 'edit_settings')) {
+      setTestPrintFeedback('Action Blocked: Only Cafe Owners and SuperAdmins can modify hardware printer configurations.');
+      setTimeout(() => setTestPrintFeedback(null), 4000);
+      return;
+    }
     updatePrinterConfig(printerForm);
     setPrinterSavedSuccess(true);
     setTimeout(() => setPrinterSavedSuccess(false), 2500);

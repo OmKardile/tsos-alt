@@ -123,6 +123,43 @@ export function canAccessTab(role: UserRole | string | undefined, tab: WebTab): 
   return config.accessibleTabs.includes(tab);
 }
 
+export type RoleAction =
+  | 'edit_settings'
+  | 'view_reports'
+  | 'export_reports'
+  | 'edit_inventory'
+  | 'edit_menu'
+  | 'manage_staff';
+
+/**
+ * Check if a role is authorized to perform a specific sensitive action
+ */
+export function canPerformAction(
+  role: UserRole | string | undefined,
+  action: RoleAction
+): boolean {
+  if (!role) return false;
+  const normalized = (role === 'super_admin' ? 'superadmin' : role) as UserRole;
+  const config = ROLE_CONFIGS[normalized];
+  if (!config) return false;
+
+  switch (action) {
+    case 'edit_settings':
+      return config.canEditSettings;
+    case 'view_reports':
+    case 'export_reports':
+      return config.canViewReports;
+    case 'edit_inventory':
+      return config.canEditInventory;
+    case 'edit_menu':
+      return config.canEditMenu;
+    case 'manage_staff':
+      return config.canManageStaff;
+    default:
+      return false;
+  }
+}
+
 /**
  * Get role display metadata
  */
@@ -131,3 +168,4 @@ export function getRoleMeta(role: UserRole | string | undefined) {
   const normalized = (role === 'super_admin' ? 'superadmin' : role) as UserRole;
   return ROLE_CONFIGS[normalized] || ROLE_CONFIGS.cashier;
 }
+

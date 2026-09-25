@@ -31,6 +31,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
+import { canPerformAction } from '../../lib/rbac';
 
 export const InventoryScreen: React.FC = () => {
   const {
@@ -40,6 +41,7 @@ export const InventoryScreen: React.FC = () => {
     categories,
     inventoryLogs,
     restockIngredient,
+    currentProfile,
   } = useTsosStore();
 
   const [activeTab, setActiveTab] = useState<'stock' | 'recipes' | 'logs'>('stock');
@@ -125,12 +127,22 @@ export const InventoryScreen: React.FC = () => {
 
   const handleRestockSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!canPerformAction(currentProfile?.role, 'edit_inventory')) {
+      setToastMessage('Action Blocked: Cashiers do not have permission to restock inventory.');
+      setTimeout(() => setToastMessage(null), 3000);
+      return;
+    }
     if (!restockModalItem || restockAmount <= 0) return;
     restockIngredient(restockModalItem.id, restockAmount, restockReason);
     setRestockModalItem(null);
   };
 
   const handleRestockOrderSuccess = (count: number) => {
+    if (!canPerformAction(currentProfile?.role, 'edit_inventory')) {
+      setToastMessage('Action Blocked: Cashiers do not have permission to place restock orders.');
+      setTimeout(() => setToastMessage(null), 3000);
+      return;
+    }
     setToastMessage(`Successfully restocked ${count} inventory item${count > 1 ? 's' : ''}!`);
     setTimeout(() => setToastMessage(null), 3000);
   };

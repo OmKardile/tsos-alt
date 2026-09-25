@@ -184,10 +184,11 @@ export default function App() {
     handleUrlRoute();
     window.addEventListener('popstate', handleUrlRoute);
     return () => window.removeEventListener('popstate', handleUrlRoute);
-  }, [tables]);
+  }, [tables, isAuthLoading]);
 
   // Sync internal state back to browser URL
   useEffect(() => {
+    if (isAuthLoading) return;
     const currentSlug = currentTenant?.slug || 'coolkafe';
     let targetPath = window.location.pathname;
 
@@ -204,7 +205,7 @@ export default function App() {
     if (window.location.pathname !== targetPath) {
       window.history.replaceState(null, '', targetPath);
     }
-  }, [activeSurface, activeWebTab, currentTenant]);
+  }, [activeSurface, activeWebTab, currentTenant, isAuthLoading]);
 
   // Live Supabase Real-Time Postgres Changes Subscription
   useEffect(() => {

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTsosStore } from '../../lib/store';
 import { DailySalesHeatmap } from './DailySalesHeatmap';
 import { WeeklySalesLineChart } from './WeeklySalesLineChart';
+import { canPerformAction } from '../../lib/rbac';
 import {
   exportFinancialLedgerCSV,
   exportDailyRevenueCSV,
@@ -27,7 +28,7 @@ import {
 } from 'lucide-react';
 
 export const ReportsScreen: React.FC = () => {
-  const { orders, menuItems, feeConfig, ingredients, inventoryLogs } = useTsosStore();
+  const { orders, menuItems, feeConfig, ingredients, inventoryLogs, currentProfile } = useTsosStore();
 
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isQuickExportOpen, setIsQuickExportOpen] = useState(false);
@@ -79,6 +80,10 @@ export const ReportsScreen: React.FC = () => {
   };
 
   const handleExportFinancialLedger = () => {
+    if (!canPerformAction(currentProfile?.role, 'export_reports')) {
+      showToast('Action Blocked: Only Store Managers and Cafe Owners can export financial ledgers.');
+      return;
+    }
     exportFinancialLedgerCSV(safeOrders, feeConfig);
     showToast('Financial Ledger CSV exported successfully!');
     setIsExportModalOpen(false);
@@ -86,6 +91,10 @@ export const ReportsScreen: React.FC = () => {
   };
 
   const handleExportDailySummary = () => {
+    if (!canPerformAction(currentProfile?.role, 'export_reports')) {
+      showToast('Action Blocked: Only Store Managers and Cafe Owners can export daily sales.');
+      return;
+    }
     exportDailyRevenueCSV(safeOrders);
     showToast('Daily Sales Summary CSV exported successfully!');
     setIsExportModalOpen(false);
@@ -93,6 +102,10 @@ export const ReportsScreen: React.FC = () => {
   };
 
   const handleExportInventory = () => {
+    if (!canPerformAction(currentProfile?.role, 'export_reports')) {
+      showToast('Action Blocked: Only Store Managers and Cafe Owners can export inventory valuations.');
+      return;
+    }
     exportInventoryStockCSV(safeIngredients, safeInventoryLogs);
     showToast('Inventory & Stock Valuation CSV exported successfully!');
     setIsExportModalOpen(false);
