@@ -3,7 +3,7 @@
  * Point-of-sale and cafe operations platform for India
  */
 
-export type UserRole = 'owner' | 'manager' | 'cashier' | 'kitchen' | 'barista' | 'chef' | 'server';
+export type UserRole = 'superadmin' | 'owner' | 'manager' | 'cashier' | 'kitchen' | 'barista' | 'chef' | 'server';
 
 export type ThemeMode = 'warm' | 'obsidian';
 

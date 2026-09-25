@@ -27,6 +27,9 @@ import { OrderTrackingScreen } from './components/storefront/OrderTrackingScreen
 import { SuperAdminScreen } from './components/superadmin/SuperAdminScreen';
 import { AuthScreen } from './components/auth/AuthScreen';
 import { CafeOnboardingWizard } from './components/auth/CafeOnboardingWizard';
+import { StaffPinPadModal } from './components/auth/StaffPinPadModal';
+import { AccessDeniedNotice } from './components/common/AccessDeniedNotice';
+import { canAccessTab } from './lib/rbac';
 import { WebTab } from './types';
 
 export default function App() {
@@ -42,12 +45,14 @@ export default function App() {
     setTrackedOrderId,
     upsertOrderFromRealtime,
     setCurrentProfile,
+    currentProfile,
     audioEnabled,
     themeMode,
   } = useTsosStore();
 
   // Authentication & Modals State
   const [authSession, setAuthSession] = useState<AuthUserSession | null>(null);
+  const [isOverridePinOpen, setIsOverridePinOpen] = useState(false);
 
   // Sync theme mode to document element
   useEffect(() => {
@@ -74,7 +79,14 @@ export default function App() {
             name: session.name,
             role: session.role,
           });
-          if (session.tenantSlug) {
+          if (session.role === 'superadmin') {
+            const pathname = window.location.pathname.toLowerCase();
+            if (pathname === '/superadmin' || pathname === '/' || pathname === '') {
+              setActiveSurface('superadmin');
+            } else if (session.tenantSlug) {
+              switchTenantScope(session.tenantSlug);
+            }
+          } else if (session.tenantSlug) {
             switchTenantScope(session.tenantSlug);
           }
         }
@@ -224,6 +236,8 @@ export default function App() {
     });
     if (isNewUser) {
       setIsOnboardingOpen(true);
+    } else if (session.role === 'superadmin') {
+      setActiveSurface('superadmin');
     } else if (session.tenantSlug) {
       switchTenantScope(session.tenantSlug);
       setActiveSurface('web');
@@ -302,6 +316,16 @@ export default function App() {
 
   // Primary Operational Web POS, KDS & Backoffice
   const renderWebContent = () => {
+    // RBAC Security Guard: Verify if active user profile has permission for requested tab
+    if (!canAccessTab(currentProfile?.role, activeWebTab)) {
+      return (
+        <AccessDeniedNotice
+          attemptedTab={activeWebTab}
+          onOpenPinModal={() => setIsOverridePinOpen(true)}
+        />
+      );
+    }
+
     switch (activeWebTab) {
       case 'pos':
         return <PosScreen />;
@@ -356,6 +380,12 @@ export default function App() {
           setActiveSurface('web');
           setActiveWebTab('pos');
         }}
+      />
+
+      {/* Manager Override PIN Modal */}
+      <StaffPinPadModal
+        isOpen={isOverridePinOpen}
+        onClose={() => setIsOverridePinOpen(false)}
       />
     </div>
   );

@@ -13,9 +13,11 @@ import {
   Sparkles,
   Moon,
   Sun,
+  Shield,
 } from 'lucide-react';
 import { ConnectionStatusIndicator, CloudOfflineBanner } from './ConnectionStatusIndicator';
 import { StaffPinPadModal } from '../auth/StaffPinPadModal';
+import { getRoleMeta } from '../../lib/rbac';
 
 interface HeaderProps {
   onSignOut?: () => void;
@@ -36,6 +38,7 @@ export const Header: React.FC<HeaderProps> = ({ onSignOut }) => {
     toggleThemeMode,
     feeConfig,
     printerConfig,
+    activeSurface,
     setActiveSurface,
     setActiveWebTab,
   } = useTsosStore();
@@ -43,6 +46,7 @@ export const Header: React.FC<HeaderProps> = ({ onSignOut }) => {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isStaffPinOpen, setIsStaffPinOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const roleMeta = getRoleMeta(currentProfile?.role);
 
   // Close profile menu when clicking outside
   useEffect(() => {
@@ -185,6 +189,21 @@ export const Header: React.FC<HeaderProps> = ({ onSignOut }) => {
               )}
             </button>
 
+            {/* SuperAdmin Platform Console Switch */}
+            {currentProfile?.role === 'superadmin' && (
+              <button
+                type="button"
+                onClick={() => setActiveSurface(activeSurface === 'superadmin' ? 'web' : 'superadmin')}
+                title="Toggle between Platform Console and Cafe Operations"
+                className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs transition-all shadow-sm cursor-pointer"
+              >
+                <Shield className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">
+                  {activeSurface === 'superadmin' ? 'Cafe POS' : 'SuperAdmin'}
+                </span>
+              </button>
+            )}
+
             {/* Fast PIN Switch Button */}
             <button
               type="button"
@@ -196,37 +215,60 @@ export const Header: React.FC<HeaderProps> = ({ onSignOut }) => {
               <span className="hidden sm:inline">Fast PIN</span>
             </button>
 
-            {/* Authenticated User Profile Dropdown */}
+            {/* Authenticated User Profile Dropdown with Role-Specific Visual Identity */}
             <div className="relative" ref={menuRef}>
               <button
                 type="button"
                 onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                className="flex items-center gap-2 pl-2 pr-2.5 py-1 rounded-xl border border-[#E9E0D6] bg-[#FFF9F2] hover:bg-[#FFF1E6] transition-all cursor-pointer"
+                className={`flex items-center gap-2 pl-2 pr-2.5 py-1 rounded-xl border transition-all cursor-pointer ${
+                  themeMode === 'obsidian'
+                    ? 'bg-stone-900 border-stone-800 text-stone-200 hover:bg-stone-800'
+                    : 'bg-[#FFF9F2] border-[#E9E0D6] text-[#1C1917] hover:bg-[#FFF1E6]'
+                }`}
               >
-                <div className="w-6 h-6 rounded-lg bg-[#1C1917] text-white flex items-center justify-center font-bold text-xs">
+                <div className={`w-6 h-6 rounded-lg flex items-center justify-center font-bold text-xs ${
+                  currentProfile.role === 'superadmin'
+                    ? 'bg-purple-600 text-white'
+                    : currentProfile.role === 'owner'
+                    ? 'bg-amber-600 text-white'
+                    : currentProfile.role === 'manager'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-emerald-600 text-white'
+                }`}>
                   {currentProfile.name.charAt(0)}
                 </div>
                 <div className="text-left hidden md:block">
-                  <div className="font-bold text-[#1C1917] leading-none text-xs">
+                  <div className="font-bold leading-none text-xs">
                     {currentProfile.name}
                   </div>
-                  <div className="text-[10px] text-[#78716C] capitalize font-medium">
-                    {currentProfile.role}
+                  <div className="text-[10px] mt-0.5 font-semibold capitalize opacity-80">
+                    {roleMeta.roleLabel}
                   </div>
                 </div>
-                <ChevronDown className="w-3.5 h-3.5 text-[#78716C]" />
+                <ChevronDown className="w-3.5 h-3.5 opacity-60" />
               </button>
 
               {/* Profile Dropdown Menu */}
               {isProfileMenuOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-[#E9E0D6] z-50 p-2 text-xs animate-in fade-in slide-in-from-top-2">
-                  <div className="p-3 bg-[#FFF9F2] rounded-xl mb-2 border border-[#E9E0D6]">
-                    <div className="font-bold text-[#1C1917] text-sm">{currentProfile.name}</div>
-                    <div className="text-[11px] text-[#78716C] capitalize mt-0.5 flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-[#16A34A]" />
-                      <span>Role: {currentProfile.role}</span>
+                <div className={`absolute right-0 mt-2 w-64 rounded-2xl shadow-xl border z-50 p-2 text-xs animate-in fade-in slide-in-from-top-2 ${
+                  themeMode === 'obsidian'
+                    ? 'bg-stone-900 border-stone-800 text-stone-200'
+                    : 'bg-white border-[#E9E0D6] text-[#1C1917]'
+                }`}>
+                  <div className={`p-3 rounded-xl mb-2 border ${
+                    themeMode === 'obsidian'
+                      ? 'bg-stone-800/80 border-stone-700'
+                      : 'bg-[#FFF9F2] border-[#E9E0D6]'
+                  }`}>
+                    <div className="font-bold text-sm">{currentProfile.name}</div>
+                    <div className="text-[11px] mt-1 flex items-center gap-1.5">
+                      <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                        themeMode === 'obsidian' ? roleMeta.badgeDarkClass : roleMeta.badgeClass
+                      }`}>
+                        {roleMeta.roleLabel}
+                      </span>
                     </div>
-                    <div className="text-[10px] text-[#A8A29E] mt-1 truncate">
+                    <div className="text-[10px] opacity-60 mt-1.5 truncate">
                       Outlet: {location.name}
                     </div>
                   </div>

@@ -5,7 +5,7 @@ export interface AuthUserSession {
   id: string;
   email: string;
   name: string;
-  role: 'owner' | 'manager' | 'cashier' | 'barista' | 'kitchen';
+  role: 'superadmin' | 'owner' | 'manager' | 'cashier' | 'barista' | 'kitchen';
   tenantId?: string;
   tenantSlug?: string;
   tenantName?: string;
@@ -24,11 +24,17 @@ export const authService = {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (session?.user) {
           const userMeta = session.user.user_metadata || {};
+          const emailLower = (session.user.email || '').toLowerCase();
+          const resolvedRole = userMeta.role || (
+            emailLower.includes('admin') ? 'superadmin' :
+            emailLower.includes('manager') ? 'manager' :
+            emailLower.includes('cashier') ? 'cashier' : 'owner'
+          );
           return {
             id: session.user.id,
             email: session.user.email || '',
-            name: userMeta.name || userMeta.full_name || session.user.email?.split('@')[0] || 'Cafe Owner',
-            role: userMeta.role || 'owner',
+            name: userMeta.name || userMeta.full_name || (emailLower.includes('admin') ? 'TSOS Super Admin' : session.user.email?.split('@')[0]) || 'Cafe Staff',
+            role: resolvedRole as any,
             tenantId: userMeta.tenant_id,
             tenantSlug: userMeta.tenant_slug,
             tenantName: userMeta.tenant_name,
@@ -83,11 +89,17 @@ export const authService = {
 
         if (!error && data.session?.user) {
           const userMeta = data.session.user.user_metadata || {};
+          const emailLower = (data.session.user.email || email).toLowerCase();
+          const resolvedRole = userMeta.role || (
+            emailLower.includes('admin') ? 'superadmin' :
+            emailLower.includes('manager') ? 'manager' :
+            emailLower.includes('cashier') ? 'cashier' : 'owner'
+          );
           const userSession: AuthUserSession = {
             id: data.session.user.id,
             email: data.session.user.email || email,
-            name: userMeta.name || userMeta.full_name || email.split('@')[0],
-            role: userMeta.role || (email.includes('admin') ? 'owner' : 'owner'),
+            name: userMeta.name || userMeta.full_name || (emailLower.includes('admin') ? 'TSOS Super Admin' : email.split('@')[0]),
+            role: resolvedRole as any,
             tenantId: userMeta.tenant_id,
             tenantSlug: userMeta.tenant_slug || 'coolkafe',
             tenantName: userMeta.tenant_name || 'CoolKafe Indiranagar',
@@ -106,7 +118,7 @@ export const authService = {
 
     // Local / Offline fallback auth for admin and demo roles
     const role = email.includes('admin')
-      ? 'owner'
+      ? 'superadmin'
       : email.includes('manager')
       ? 'manager'
       : email.includes('cashier')
