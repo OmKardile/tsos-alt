@@ -64,8 +64,74 @@ npx vercel --prod
 
 ---
 
+### Option C: Deploying to Render (Free Static Site with Zero Cold Starts)
+
+Render is an outstanding cloud deployment platform for TSOS. Because TSOS is a client-side Vite SPA backed directly by Supabase, it runs as a **Static Site** on Render.
+
+#### Why Render is Great for TSOS:
+1. **100% Free Forever**: Render Static Sites do not charge and have generous bandwidth.
+2. **Zero Cold Starts / Instant Load**: Unlike Render *Web Services* (which sleep after 15 min on the free tier), Render *Static Sites* run on a global CDN and **NEVER spin down**. Customers scanning table QR codes get instant loads every single time.
+3. **Automated Infrastructure-as-Code**: We have created [`render.yaml`](file:///d:/work/megatech/mega-tsos/render.yaml) at the repository root, so Render can configure everything in 1 click via Blueprints.
+
+#### Method 1: 1-Click Deploy via Render Blueprints (Recommended)
+1. Push your repository to GitHub / GitLab:
+   ```powershell
+   git remote add origin https://github.com/YOUR_USERNAME/mega-tsos.git
+   git push -u origin master
+   ```
+2. Log into the [Render Dashboard](https://dashboard.render.com).
+3. Click **New +** $\rightarrow$ **Blueprint**.
+4. Connect your `mega-tsos` repository.
+5. Render will automatically parse [`render.yaml`](file:///d:/work/megatech/mega-tsos/render.yaml):
+   - Service Type: `Static Site`
+   - Build Command: `npm install && npm run build`
+   - Publish Directory: `./dist`
+   - Routing Rewrites: `/*` $\rightarrow$ `/index.html` (prevents 404s on table QR & POS URLs)
+   - Environment Variables: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
+6. Click **Apply**. Your app is live with a free `onrender.com` SSL domain in ~2 minutes!
+
+#### Method 2: Manual Setup via Render Web Dashboard
+If you prefer configuring it manually without Blueprints:
+1. In the [Render Dashboard](https://dashboard.render.com), click **New +** $\rightarrow$ **Static Site**.
+2. Connect your Git repository.
+3. Configure the build parameters:
+   - **Name**: `tsos-cafe-pos`
+   - **Branch**: `master` (or `main`)
+   - **Build Command**: `npm install && npm run build`
+   - **Publish Directory**: `dist`
+4. Add **Environment Variables**:
+   - `VITE_SUPABASE_URL`: `https://vbufsuzzmehsidshopku.supabase.co`
+   - `VITE_SUPABASE_ANON_KEY`: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZidWZzdXp6bWVoc2lkc2hvcGt1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyOTE0MjMsImV4cCI6MjEwNTg2NzQyM30.kymgulEpO3R7FRhrfFO-lpmYrAcOqBF82sSW4unZHBE`
+5. Configure **Redirects / Rewrites** (CRITICAL for client-side routing):
+   - Navigate to the **Redirects/Rewrites** tab of your static site.
+   - Click **Add Rule**:
+     - **Type**: `Rewrite`
+     - **Source**: `/*`
+     - **Destination**: `/index.html`
+   *(Without this, refreshing `/:slug/pos` or table QR links like `/:slug/t1` will return a 404)*
+6. Click **Create Static Site**.
+
+---
+
+### Comparison: Vercel vs Render for TSOS
+
+| Feature | Vercel | Render (Static Site) |
+|---|---|---|
+| **Cost** | 100% Free Hobby Tier | 100% Free Tier |
+| **Cold Starts** | None (Edge CDN) | None (Static CDN - never sleeps) |
+| **CLI Deploy** | Instant (`npx vercel`) without git push | Requires Git repo connection |
+| **Config as Code** | [`vercel.json`](file:///d:/work/megatech/mega-tsos/vercel.json) | [`render.yaml`](file:///d:/work/megatech/mega-tsos/render.yaml) |
+| **SPA Rewrites** | Pre-configured in `vercel.json` | Pre-configured in `render.yaml` |
+| **Custom Domain + SSL** | Free automatic SSL | Free automatic SSL |
+| **Backend Integration** | Serverless functions if needed | Background workers / containers if needed |
+
+Both options are production-grade for TSOS. If you want instant command-line deployment without setting up a Git remote, use **Vercel** (`npx vercel`). If you already push to GitHub and prefer Render's unified dashboard, use **Render** (via `render.yaml`).
+
+---
+
 ## 3. 📱 Client Architecture Policy
 
 - **Customer Tableside Ordering**: 100% Zero-install browser experience. Customers scan the physical table QR code with their phone camera $\rightarrow$ opens `https://<DOMAIN>/<SLUG>/t<TABLE>?token=<SECRET>` in their mobile browser $\rightarrow$ authenticates a 10-minute cryptographic session (`table_sessions`). No native app downloads needed.
 - **Desktop POS Terminals**: Native Windows WPF app is **FROZEN**. Desktop POS deployments focus on **Electron.js** wrapping the unified web POS terminal for cross-platform direct hardware access (raw ESC/POS WebUSB/WebSerial printers and cash drawers).
+
 

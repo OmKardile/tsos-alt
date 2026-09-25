@@ -1,7 +1,7 @@
 # TSOS Technical Documentation & Architecture Specification
 
 - **System**: TSOS (The Cafe Operating System)
-- **Version**: 2.2.0
+- **Version**: 2.4.0
 - **Architect**: Lead Full-Stack Security & Platform Architect
 - **Updated**: September 25, 2026
 
@@ -264,7 +264,32 @@ The application maintains persistent PostgreSQL change subscriptions per tenant 
 ## 11. Verification & Production Build
 
 - **Static Type Checking**: `npx tsc --noEmit` $\rightarrow$ 0 errors.
-- **Production Bundle**: `npm run build` $\rightarrow$ Built with Vite in 8.04s; production assets chunked into `dist/`.
+- **Production Bundle**: `npm run build` $\rightarrow$ Built with Vite in 8.22s; production assets chunked into `dist/`.
 - **Database Connection**: Tested via PostgreSQL pooler connection over port 5432. All RPC procedures verified with positive and negative security assertions.
 - **Browser Automation Walkthrough**: Verified complete end-to-end POS, KDS, Shifts, Inventory, and SuperAdmin flows.
+
+---
+
+## 12. Production Cloud Hosting Architecture (Render & Vercel)
+
+TSOS is architected as a decoupled client-side Single-Page Application (SPA) interfacing with a managed Supabase PostgreSQL backend. It supports dual enterprise cloud hosting deployments:
+
+### 12.1 Render Static Site (`render.yaml`)
+- **Runtime**: `static` (zero-cost edge CDN hosting).
+- **Zero Cold Starts**: Unlike Render Web Services (which spin down after 15 min on the free tier), Render Static Sites are globally distributed CDN assets and **never sleep**, guaranteeing immediate response times when diners scan table QR codes.
+- **Infrastructure-as-Code (IaC)**: Managed via [`render.yaml`](file:///d:/work/megatech/mega-tsos/render.yaml) using Render Blueprints.
+- **Client-Side Routing Rewrite**:
+  ```yaml
+  routes:
+    - type: rewrite
+      source: /*
+      destination: /index.html
+  ```
+  Ensures dynamic scoped paths (`/:slug/pos`, `/:slug/t1?token=...`, `/superadmin`) resolve directly to `index.html` without 404 HTTP errors.
+
+### 12.2 Vercel Edge CDN (`vercel.json`)
+- **Runtime**: Vercel Edge Network.
+- **Configuration**: Managed via [`vercel.json`](file:///d:/work/megatech/mega-tsos/vercel.json) with catch-all rewrites (`"source": "/(.*)", "destination": "/index.html"`).
+- **Fast CLI Deployment**: Supports one-command builds and instant previews via `npx vercel`.
+
 

@@ -140,4 +140,13 @@ This document maintains an exact, comprehensive chronological ledger of all user
 - **Core Directive**: Remove TSOS Hardware Hub & Native Clients totally; freeze native windows app in favor of Electron; cancel native customer app since customers just scan QR with phone camera and browser directly opens session.
 - **Resolution**: Completely deleted `HardwareDownloadsModal.tsx`, `AndroidAppClient.tsx`, removed all hardware download buttons and routes from `Header.tsx`, `SettingsScreen.tsx`, and `App.tsx`. Marked `WindowsAppClient.tsx` [FROZEN] in favor of Electron.js. Verified clean build (`npm run build` 10.85s, 0 errors).
 
+---
+
+## Request 16: Render Cloud Deployment Evaluation & Blueprint Configuration
+
+- **Timestamp**: 2026-09-25T15:30:00Z
+- **Core Directive**: "how about render" — evaluate and configure Render (render.com) for production deployment of TSOS.
+- **Resolution**: Evaluated Render vs. Vercel for the TSOS React/Vite SPA and Supabase backend. Established that Render Static Site is 100% free with zero cold starts / zero sleep downtime. Implemented `render.yaml` Blueprint with `npm install && npm run build`, `./dist` publish path, client-side routing rewrite rule (`/* -> /index.html`), and pre-configured Supabase environment variables. Documented 1-click Blueprint and manual dashboard deployment procedures in `help.md`, `README.md`, `CHANGELOG.md`, `technical-documentation.md`, and ADR 0008. Verified production build compiles in 8.22s with 0 errors.
+
+
 

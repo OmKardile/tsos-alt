@@ -130,13 +130,20 @@ The application will launch at `http://localhost:3000`.
 - `/coolkafe/t1?token=demo_token`: Tableside QR ordering for Table 1 with 10-minute security countdown.
 - `/superadmin`: Platform SuperAdmin dashboard.
 
+### 3. Production Cloud Deployment
+- **Render (Static Site - Zero Sleep Delay)**: Deploy via Render Blueprints using [`render.yaml`](render.yaml) or connect Git repository in the Render dashboard. Configured with rewrite rule `/* -> /index.html`.
+- **Vercel (Edge CDN)**: Deploy via `npx vercel` or GitHub import using [`vercel.json`](vercel.json).
+- See **[help.md](help.md)** for complete credentials, environment variables, and 1-minute deployment walkthroughs.
+
 ---
 
 ## 📚 Documentation Quick Links
 
+- **[help.md](help.md)**: Production deployment guide (Render & Vercel) & credentials cheat sheet.
 - **[CHANGELOG.md](CHANGELOG.md)**: Release history and version logs.
 - **[technical-documentation.md](technical-documentation.md)**: Deep technical architecture, schema specifications, and cryptographic protocols.
 - **[business-documentation.md](business-documentation.md)**: Multi-tenant SaaS business model, subscription tiers, and cafe unit economics.
-- **[docs/decisions/](docs/decisions/README.md)**: All Architecture Decision Records (ADR 0001 through 0005).
+- **[docs/decisions/](docs/decisions/README.md)**: All Architecture Decision Records (ADR 0001 through 0008).
 - **[docs/compacts/](docs/compacts/README.md)**: Chronological project phase summaries.
 - **[docs/worklog/](docs/worklog/2026-09-25.md)**: Detailed daily engineering commit ledger.
+
